@@ -1,6 +1,7 @@
 """元数据登记：数据源 → 表 → 字段。"""
 from sqlalchemy.orm import Session
 
+from app.core.crypto import encrypt
 from app.models.datasource import Datasource, MetaColumn, MetaTable
 from app.services.excel_service import ParsedSheet
 
@@ -48,7 +49,7 @@ def register_db_tables(
 
     tables_info: [{"table_name": str, "columns": [{"name", "data_type"}]}]
     """
-    ds = Datasource(name=name, type="db", conn_info=url, status="ready", created_by=user_id)
+    ds = Datasource(name=name, type="db", conn_info=encrypt(url), status="ready", created_by=user_id)
     db.add(ds)
     db.flush()
 

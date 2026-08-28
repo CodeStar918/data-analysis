@@ -24,6 +24,18 @@ class Settings(BaseSettings):
     DUCKDB_PATH: str = "./data/report.duckdb"
     MAX_UPLOAD_MB: int = 20
 
+    # 阶段 4：Ollama 本地模型
+    OLLAMA_BASE_URL: str = "http://localhost:11434"
+    OLLAMA_MODEL: str = "qwen2.5:7b"
+    OLLAMA_TIMEOUT_SECONDS: int = 120
+
+    # 阶段 5：异步任务（开发默认 eager 同步执行，无需 Redis；部署时设为 false 并启动 worker）
+    REDIS_URL: str = "redis://localhost:6379/0"
+    CELERY_EAGER: bool = True
+
+    # 阶段 7：安全加固。SECURITY_KEY 为空时派生自 JWT_SECRET
+    SECURITY_KEY: str = ""
+
 
 @lru_cache
 def get_settings() -> Settings:

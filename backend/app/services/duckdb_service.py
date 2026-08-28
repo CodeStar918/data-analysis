@@ -77,3 +77,30 @@ def table_exists(table_name: str) -> bool:
 def drop_table(table_name: str) -> None:
     with _lock:
         get_conn().execute(f'DROP TABLE IF EXISTS "{table_name}"')
+
+
+def execute_ddl(ddl: str) -> None:
+    """执行 DDL（建结果表等）。仅限内部调用，SQL 由 sql_builder 生成。"""
+    with _lock:
+        get_conn().execute(ddl)
+
+
+def count_rows(table_name: str) -> int:
+    _validate_table(table_name)
+    with _lock:
+        row = get_conn().execute(f'SELECT COUNT(1) FROM "{table_name}"').fetchone()
+    return int(row[0])
+
+
+def fetch_df(table_name: str):
+    """读取整表为 DataFrame（导出用）。"""
+    _validate_table(table_name)
+    with _lock:
+        return get_conn().execute(f'SELECT * FROM "{table_name}"').df()
+
+
+def _validate_table(table_name: str) -> None:
+    import re
+
+    if not re.match(r"^[\w\u4e00-\u9fff]+$", table_name):
+        raise ValueError(f"非法表名: {table_name}")

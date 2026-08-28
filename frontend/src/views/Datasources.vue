@@ -5,6 +5,9 @@
       <div class="right">
         <el-button :type="$route.path === '/datasources' ? 'primary' : ''" text @click="$router.push('/datasources')">数据源</el-button>
         <el-button :type="$route.path === '/metadata' ? 'primary' : ''" text @click="$router.push('/metadata')">元数据</el-button>
+        <el-button :type="$route.path === '/workspace' ? 'primary' : ''" text @click="$router.push('/workspace')">工作台</el-button>
+        <el-button :type="$route.path === '/results' ? 'primary' : ''" text @click="$router.push('/results')">结果中心</el-button>
+        <el-button v-if="['admin', 'dept_admin'].includes(user.role)" :type="$route.path === '/approvals' ? 'primary' : ''" text @click="$router.push('/approvals')">审批</el-button>
         <span class="user">{{ user.username }}</span>
         <el-button link type="danger" @click="handleLogout">退出登录</el-button>
       </div>
