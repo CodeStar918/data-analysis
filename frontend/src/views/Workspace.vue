@@ -84,10 +84,12 @@
             type="success"
             size="large"
             :disabled="confirmed"
-            @click="doConfirm"
+            :loading="jobRunning"
+            @click="doRunJob"
           >
-            {{ confirmed ? '已确认 ✓' : '确认无误，执行（阶段 5 开放）' }}
+            {{ jobButton }}
           </el-button>
+          <el-button v-if="jobDone" size="large" @click="$router.push('/results')">查看结果中心</el-button>
         </template>
 
         <template v-else>
@@ -123,6 +125,15 @@ const question = ref('')
 const parsing = ref(false)
 const parseResult = ref(null)
 const confirmed = ref(false)
+const jobRunning = ref(false)
+const jobDone = ref(false)
+
+const jobButton = computed(() => {
+  if (jobDone.value) return '生成完成 ✓'
+  if (jobRunning.value) return '正在生成…'
+  if (confirmed.value) return '生成统计表'
+  return '确认无误并生成统计表'
+})
 
 onMounted(loadDatasources)
 
@@ -148,6 +159,8 @@ async function doParse() {
   parsing.value = true
   parseResult.value = null
   confirmed.value = false
+  jobRunning.value = false
+  jobDone.value = false
   try {
     parseResult.value = await request.post('/nl/parse', {
       table_id: selectedTable.value,
@@ -161,7 +174,35 @@ async function doParse() {
 async function doConfirm() {
   await request.post('/nl/confirm', { parse_id: parseResult.value.parse_id })
   confirmed.value = true
-  ElMessage.success('已确认，任务执行将在阶段 5 开放')
+}
+
+async function doRunJob() {
+  // 未确认则先确认，再提交任务
+  if (!confirmed.value) {
+    await doConfirm()
+  }
+  jobRunning.value = true
+  try {
+    const job = await request.post('/jobs', { parse_id: parseResult.value.parse_id })
+    // eager 模式同步完成；非 eager 轮询状态
+    let status = job.status
+    let jobId = job.job_id
+    while (status === 'pending' || status === 'running') {
+      await new Promise((r) => setTimeout(r, 1000))
+      const detail = await request.get(`/jobs/${jobId}`)
+      status = detail.status
+      if (detail.status === 'failed') {
+        ElMessage.error(`任务失败：${detail.error_msg}`)
+        return
+      }
+    }
+    if (status === 'success') {
+      jobDone.value = true
+      ElMessage.success('统计表生成成功')
+    }
+  } finally {
+    jobRunning.value = false
+  }
 }
 
 function handleLogout() {

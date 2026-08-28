@@ -8,5 +8,6 @@ duckdb>=1.1
 pandas>=2.2
 openpyxl>=3.1
 python-multipart>=0.0.12
+celery[redis]>=5.4
 httpx>=0.28
 pytest>=8.3

@@ -31,6 +31,12 @@ const routes = [
     component: () => import('../views/Workspace.vue'),
     meta: { requiresAuth: true },
   },
+  {
+    path: '/results',
+    name: 'Results',
+    component: () => import('../views/Results.vue'),
+    meta: { requiresAuth: true },
+  },
 ]
 
 const router = createRouter({

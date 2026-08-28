@@ -29,6 +29,10 @@ class Settings(BaseSettings):
     OLLAMA_MODEL: str = "qwen2.5:7b"
     OLLAMA_TIMEOUT_SECONDS: int = 120
 
+    # 阶段 5：异步任务（开发默认 eager 同步执行，无需 Redis；部署时设为 false 并启动 worker）
+    REDIS_URL: str = "redis://localhost:6379/0"
+    CELERY_EAGER: bool = True
+
 
 @lru_cache
 def get_settings() -> Settings:

@@ -67,3 +67,26 @@ def auth_headers(client) -> dict:
     resp = client.post("/api/auth/login", json={"username": "admin", "password": "admin123"})
     token = resp.json()["access_token"]
     return {"Authorization": f"Bearer {token}"}
+
+
+@pytest.fixture()
+def sales_table_id(client, auth_headers) -> int:
+    """上传销售样例 Excel（区域/销售金额/下单日期），返回表 ID。"""
+    from app.tests.excel_helpers import SAMPLE_TIME, build_xlsx
+
+    content = build_xlsx(
+        {
+            "销售明细": [
+                ["区域", "销售金额", "下单日期"],
+                ["华东", 5000.5, SAMPLE_TIME],
+                ["华北", 8000, SAMPLE_TIME],
+                ["华东", 3000, SAMPLE_TIME],
+            ]
+        }
+    )
+    resp = client.post(
+        "/api/upload",
+        headers=auth_headers,
+        files={"file": ("sales.xlsx", content, "application/octet-stream")},
+    )
+    return resp.json()["tables"][0]["id"]

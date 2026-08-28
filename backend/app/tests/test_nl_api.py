@@ -3,28 +3,6 @@ import pytest
 
 from app.services import ollama_service
 from app.services.ollama_service import OllamaError
-from app.tests.excel_helpers import SAMPLE_TIME, build_xlsx
-
-
-@pytest.fixture()
-def sales_table_id(client, auth_headers) -> int:
-    """上传销售样例 Excel，返回表 ID。"""
-    content = build_xlsx(
-        {
-            "销售明细": [
-                ["区域", "销售金额", "下单日期"],
-                ["华东", 5000.5, SAMPLE_TIME],
-                ["华北", 8000, SAMPLE_TIME],
-                ["华东", 3000, SAMPLE_TIME],
-            ]
-        }
-    )
-    resp = client.post(
-        "/api/upload",
-        headers=auth_headers,
-        files={"file": ("sales.xlsx", content, "application/octet-stream")},
-    )
-    return resp.json()["tables"][0]["id"]
 
 
 def _mock_llm(monkeypatch, payload):
