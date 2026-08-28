@@ -12,6 +12,7 @@ from app.db.session import get_db
 from app.models.job import ResultTable
 from app.schemas.auth import CurrentUser
 from app.services import duckdb_service
+from app.services.audit_service import audit
 
 router = APIRouter(prefix="/api/results", tags=["result"])
 
@@ -77,6 +78,7 @@ def export_result(
         raise HTTPException(404, "结果表不存在，可能已被清理")
 
     df = duckdb_service.fetch_df(rt.table_name)
+    audit(db, user.id, user.username, "export", f"导出 {rt.table_name} ({format})", commit=True)
     filename = f"{rt.table_name}.{format}"
 
     if format == "csv":

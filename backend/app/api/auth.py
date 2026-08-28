@@ -1,5 +1,5 @@
 """登录与当前用户接口。"""
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Request, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from sqlalchemy.orm import Session
 
@@ -7,20 +7,25 @@ from app.core.security import create_access_token, decode_token, verify_password
 from app.db.session import get_db
 from app.models.user import User
 from app.schemas.auth import CurrentUser, LoginRequest, LoginResponse
+from app.services.audit_service import audit
 
 router = APIRouter(prefix="/api/auth", tags=["auth"])
 bearer_scheme = HTTPBearer(auto_error=False)
 
 
 @router.post("/login", response_model=LoginResponse)
-def login(body: LoginRequest, db: Session = Depends(get_db)) -> LoginResponse:
+def login(body: LoginRequest, request: Request, db: Session = Depends(get_db)) -> LoginResponse:
+    ip = request.client.host if request.client else ""
     user = db.query(User).filter(User.username == body.username).first()
     if user is None or not verify_password(body.password, user.password_hash):
+        audit(db, 0, body.username, "login_failed", "用户名或密码错误", ip, commit=True)
         raise HTTPException(status.HTTP_401_UNAUTHORIZED, "用户名或密码错误")
     if not user.is_active:
+        audit(db, user.id, user.username, "login_failed", "账号已禁用", ip, commit=True)
         raise HTTPException(status.HTTP_403_FORBIDDEN, "账号已禁用")
 
     token = create_access_token(user.id, user.username)
+    audit(db, user.id, user.username, "login", "登录成功", ip, commit=True)
     return LoginResponse(access_token=token, username=user.username, role=user.role)
 
 

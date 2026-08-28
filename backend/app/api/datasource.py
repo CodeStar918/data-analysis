@@ -3,6 +3,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 
 from app.api.auth import get_current_user
+from app.core.crypto import decrypt
 from app.db.session import get_db
 from app.models.datasource import Datasource, MetaColumn, MetaTable
 from app.schemas.auth import CurrentUser
@@ -84,9 +85,9 @@ def preview_table(
             raise HTTPException(404, "物理表不存在，可能已被清理")
         phys_cols, rows = duckdb_service.preview(t.table_name, limit)
     else:
-        # 业务库表：只读预览
+        # 业务库表：只读预览（连接串加密存储，用时解密）
         try:
-            phys_cols, rows = db_service.read_table_preview(ds.id, ds.conn_info, t.table_name, limit)
+            phys_cols, rows = db_service.read_table_preview(ds.id, decrypt(ds.conn_info), t.table_name, limit)
         except ValueError as e:
             raise HTTPException(400, str(e)) from e
         except Exception as e:

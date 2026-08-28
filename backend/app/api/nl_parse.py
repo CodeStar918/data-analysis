@@ -11,6 +11,7 @@ from app.models.parse_history import ParseHistory
 from app.schemas.auth import CurrentUser
 from app.schemas.nl import ConfirmRequest, ParseRequest
 from app.services import ollama_service
+from app.services.audit_service import audit
 from app.services.nl_parser import TableMeta, build_prompt, validate
 from app.services.ollama_service import OllamaError
 from app.services.sql_builder import build_select_sql
@@ -81,6 +82,7 @@ def parse_question(
     )
     db.add(history)
     db.commit()
+    audit(db, user.id, user.username, "parse", f"{body.question}（校验{'通过' if result is not None else '未通过'}）", commit=True)
 
     if result is None:
         return {"parse_id": history.id, "valid": False, "errors": errors, "raw": raw}
@@ -108,4 +110,5 @@ def confirm_parse(
         raise HTTPException(400, "解析结果未通过校验，无法确认")
     history.confirmed = True
     db.commit()
+    audit(db, user.id, user.username, "parse_confirm", f"确认解析 #{history.id}", commit=True)
     return {"parse_id": history.id, "confirmed": True}

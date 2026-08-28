@@ -4,6 +4,7 @@ from datetime import UTC, datetime
 
 from sqlalchemy.orm import Session
 
+from app.core.crypto import decrypt
 from app.core.logging import setup_logging
 from app.db.session import get_engine
 from app.models.datasource import Datasource, MetaColumn, MetaTable
@@ -83,7 +84,7 @@ def _run_job(db: Session, job: Job) -> None:
         import pandas as pd
         from sqlalchemy import create_engine, text
 
-        engine = create_engine(ds.conn_info, pool_pre_ping=True)
+        engine = create_engine(decrypt(ds.conn_info), pool_pre_ping=True)
         try:
             df = pd.read_sql(text(select_sql), engine)
         finally:

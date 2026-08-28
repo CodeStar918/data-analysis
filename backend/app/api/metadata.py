@@ -8,6 +8,7 @@ from app.models.datasource import Datasource, MetaColumn, MetaTable
 from app.schemas.auth import CurrentUser
 from app.schemas.metadata import DbDatasourceCreate, MetaColumnUpdate, MetaTableUpdate
 from app.services import db_service
+from app.services.audit_service import audit
 from app.services.metadata_service import register_db_tables
 
 router = APIRouter(prefix="/api", tags=["metadata"])
@@ -33,6 +34,7 @@ def register_db_datasource(
         raise HTTPException(400, f"数据库连接失败: {e}") from e
 
     ds = register_db_tables(db, user.id, body.name, body.url, tables_info)
+    audit(db, user.id, user.username, "datasource_register", f"接入数据库数据源 {body.name}，{len(tables_info)} 张表", commit=True)
     table_count = db.query(MetaTable).filter(MetaTable.datasource_id == ds.id).count()
     return {
         "datasource_id": ds.id,

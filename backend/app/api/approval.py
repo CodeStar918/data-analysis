@@ -15,6 +15,7 @@ from app.models.job import Job, ResultTable
 from app.models.parse_history import ParseHistory
 from app.schemas.auth import CurrentUser
 from app.services.approval_service import apply_writeback
+from app.services.audit_service import audit
 
 router = APIRouter(prefix="/api/approvals", tags=["approval"])
 
@@ -70,6 +71,7 @@ def create_approval(
     approval = Approval(job_id=job.id, applicant=user.id, reason=body.reason)
     db.add(approval)
     db.commit()
+    audit(db, user.id, user.username, "approval_create", f"任务 #{job.id} 申请写回：{body.reason}", commit=True)
     return {"approval_id": approval.id, "status": approval.status}
 
 
@@ -166,4 +168,5 @@ def decide(
     rt.applied_to_source = True
     approval.status = "approved"
     db.commit()
+    audit(db, user.id, user.username, "approval_decide", f"审批通过，写回原表 {mt.table_name}（{len(new_columns)} 个字段）", commit=True)
     return {"approval_id": approval.id, "status": approval.status}
