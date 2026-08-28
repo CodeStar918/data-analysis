@@ -37,6 +37,12 @@ const routes = [
     component: () => import('../views/Results.vue'),
     meta: { requiresAuth: true },
   },
+  {
+    path: '/approvals',
+    name: 'Approvals',
+    component: () => import('../views/Approvals.vue'),
+    meta: { requiresAuth: true, requiresAdmin: true },
+  },
 ]
 
 const router = createRouter({
@@ -48,6 +54,9 @@ router.beforeEach((to) => {
   const user = useUserStore()
   if (to.meta.requiresAuth && !user.token) {
     return { name: 'Login' }
+  }
+  if (to.meta.requiresAdmin && !['admin', 'dept_admin'].includes(user.role)) {
+    return { name: 'Home' }
   }
 })
 

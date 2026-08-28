@@ -7,6 +7,7 @@
         <el-button :type="$route.path === '/metadata' ? 'primary' : ''" text @click="$router.push('/metadata')">元数据</el-button>
         <el-button :type="$route.path === '/workspace' ? 'primary' : ''" text @click="$router.push('/workspace')">工作台</el-button>
         <el-button :type="$route.path === '/results' ? 'primary' : ''" text @click="$router.push('/results')">结果中心</el-button>
+        <el-button v-if="['admin', 'dept_admin'].includes(user.role)" :type="$route.path === '/approvals' ? 'primary' : ''" text @click="$router.push('/approvals')">审批</el-button>
         <span class="user">{{ user.username }}</span>
         <el-button link type="danger" @click="handleLogout">退出登录</el-button>
       </div>
@@ -23,15 +24,41 @@
           <el-table-column label="生成时间" width="170">
             <template #default="{ row }">{{ formatTime(row.created_at) }}</template>
           </el-table-column>
-          <el-table-column label="操作" width="220">
+          <el-table-column label="类型" width="90">
+            <template #default="{ row }">
+              <el-tag :type="row.result_type === 'aggregate' ? 'primary' : 'warning'" effect="plain">
+                {{ row.result_type === 'aggregate' ? '统计' : '明细' }}
+              </el-tag>
+            </template>
+          </el-table-column>
+          <el-table-column label="操作" width="260">
             <template #default="{ row }">
               <el-button link type="primary" @click="openPreview(row)">预览</el-button>
               <el-button link type="success" @click="exportResult(row, 'xlsx')">导出 Excel</el-button>
               <el-button link @click="exportResult(row, 'csv')">导出 CSV</el-button>
+              <el-button
+                v-if="row.result_type === 'add_column' && !row.applied_to_source"
+                link
+                type="warning"
+                @click="openApply(row)"
+              >申请写回</el-button>
+              <el-tag v-else-if="row.result_type === 'add_column'" type="success" size="small" effect="plain">已写回</el-tag>
             </template>
           </el-table-column>
         </el-table>
       </el-card>
+
+      <!-- 写回申请弹窗 -->
+      <el-dialog v-model="applyVisible" title="申请写回原表" width="480">
+        <el-alert type="warning" :closable="false" class="apply-tip">
+          写回将修改原始数据表，需管理员审批通过后执行
+        </el-alert>
+        <el-input v-model="applyReason" type="textarea" :rows="3" placeholder="请填写写回理由" />
+        <template #footer>
+          <el-button @click="applyVisible = false">取消</el-button>
+          <el-button type="primary" :loading="applyLoading" @click="submitApply">提交申请</el-button>
+        </template>
+      </el-dialog>
 
       <el-dialog v-model="previewVisible" :title="`结果预览：${current?.table_name || ''}`" width="80%">
         <el-table :data="previewData.rows" max-height="450" size="small" border v-loading="previewLoading">
@@ -64,6 +91,10 @@ const previewVisible = ref(false)
 const previewLoading = ref(false)
 const current = ref(null)
 const previewData = ref({ columns: [], rows: [] })
+const applyVisible = ref(false)
+const applyReason = ref('')
+const applyLoading = ref(false)
+const applyTarget = ref(null)
 
 onMounted(load)
 
@@ -96,6 +127,30 @@ async function exportResult(row, format) {
   a.click()
   URL.revokeObjectURL(url)
   ElMessage.success('已开始下载')
+}
+
+function openApply(row) {
+  applyTarget.value = row
+  applyReason.value = ''
+  applyVisible.value = true
+}
+
+async function submitApply() {
+  if (!applyReason.value.trim()) {
+    ElMessage.warning('请填写写回理由')
+    return
+  }
+  applyLoading.value = true
+  try {
+    await request.post('/approvals', {
+      job_id: applyTarget.value.job_id,
+      reason: applyReason.value.trim(),
+    })
+    applyVisible.value = false
+    ElMessage.success('申请已提交，等待管理员审批')
+  } finally {
+    applyLoading.value = false
+  }
 }
 
 function formatTime(t) {

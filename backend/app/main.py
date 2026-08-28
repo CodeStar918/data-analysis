@@ -3,6 +3,7 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 
+from app.api.approval import router as approval_router
 from app.api.auth import router as auth_router
 from app.api.datasource import router as datasource_router
 from app.api.metadata import router as metadata_router
@@ -36,6 +37,7 @@ def create_app() -> FastAPI:
     app.include_router(nl_parse_router)
     app.include_router(jobs_router)
     app.include_router(result_router)
+    app.include_router(approval_router)
 
     @app.get("/health", tags=["system"])
     def health():

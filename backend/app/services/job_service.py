@@ -67,14 +67,13 @@ def _run_job(db: Session, job: Job) -> None:
     result, errors = validate(raw, meta)
     if result is None:
         raise ValueError(f"解析结果校验失败: {'；'.join(errors)}")
-    if result.intent != "aggregate":
-        raise ValueError("明细结果生成将在阶段 6 开放")
 
     select_sql = build_select_sql(meta, result)
     ds = db.get(Datasource, t.datasource_id)
 
-    # 结果表命名：rpt_{job_id}_{时间戳}
-    rpt_name = f"rpt_{job.id}_{datetime.now().strftime('%Y%m%d%H%M%S')}"
+    # 结果表命名：rpt_/detail_{job_id}_{时间戳}
+    prefix = "rpt" if result.intent == "aggregate" else "detail"
+    rpt_name = f"{prefix}_{job.id}_{datetime.now().strftime('%Y%m%d%H%M%S')}"
     if ds.type == "excel":
         duckdb_service.execute_ddl(f'DROP TABLE IF EXISTS "{rpt_name}"')
         duckdb_service.execute_ddl(f'CREATE TABLE "{rpt_name}" AS {select_sql}')
@@ -95,7 +94,7 @@ def _run_job(db: Session, job: Job) -> None:
     rt = ResultTable(
         job_id=job.id,
         table_name=rpt_name,
-        result_type="aggregate",
+        result_type=result.intent,
         business_name=history.question[:200],
         row_count=row_count,
         created_by=job.user_id,
