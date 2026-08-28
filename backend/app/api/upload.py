@@ -8,6 +8,7 @@ from app.db.session import get_db
 from app.models.datasource import Datasource, MetaColumn, MetaTable
 from app.schemas.auth import CurrentUser
 from app.services import duckdb_service
+from app.services.audit_service import audit
 from app.services.excel_service import parse_excel
 from app.services.metadata_service import register_excel_datasource
 
@@ -42,6 +43,7 @@ def upload_excel(
         raise HTTPException(400, "Excel 中没有可解析的数据表")
 
     ds = register_excel_datasource(db, user.id, filename, sheets)
+    audit(db, user.id, user.username, "upload", f"上传 {filename}，{len(sheets)} 个 sheet", commit=True)
 
     # 导入 DuckDB；失败则标记数据源失败
     try:

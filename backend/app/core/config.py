@@ -33,6 +33,9 @@ class Settings(BaseSettings):
     REDIS_URL: str = "redis://localhost:6379/0"
     CELERY_EAGER: bool = True
 
+    # 阶段 7：安全加固。SECURITY_KEY 为空时派生自 JWT_SECRET
+    SECURITY_KEY: str = ""
+
 
 @lru_cache
 def get_settings() -> Settings:

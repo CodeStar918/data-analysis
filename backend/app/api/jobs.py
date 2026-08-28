@@ -11,6 +11,7 @@ from app.models.job import Job
 from app.models.parse_history import ParseHistory
 from app.schemas.auth import CurrentUser
 from app.services import job_service
+from app.services.audit_service import audit
 
 router = APIRouter(prefix="/api/jobs", tags=["job"])
 
@@ -43,6 +44,7 @@ def create_job(
     )
     db.add(job)
     db.commit()
+    audit(db, user.id, user.username, "job_create", f"{intent} 任务（解析 #{history.id}）", commit=True)
 
     job_service.execute_job_task(job.id)
 
