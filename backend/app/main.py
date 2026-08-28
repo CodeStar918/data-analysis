@@ -6,7 +6,9 @@ from fastapi import FastAPI
 from app.api.auth import router as auth_router
 from app.api.datasource import router as datasource_router
 from app.api.metadata import router as metadata_router
+from app.api.jobs import router as jobs_router
 from app.api.nl_parse import router as nl_parse_router
+from app.api.result import router as result_router
 from app.api.upload import router as upload_router
 from app.core.config import get_settings
 from app.core.logging import setup_logging
@@ -32,6 +34,8 @@ def create_app() -> FastAPI:
     app.include_router(datasource_router)
     app.include_router(metadata_router)
     app.include_router(nl_parse_router)
+    app.include_router(jobs_router)
+    app.include_router(result_router)
 
     @app.get("/health", tags=["system"])
     def health():

@@ -25,11 +25,29 @@ services:
     environment:
       DATABASE_URL: postgresql+psycopg://report:report123@postgres:5432/report_platform
       JWT_SECRET: change-me-in-production
+      REDIS_URL: redis://redis:6379/0
+      CELERY_EAGER: "false"
     ports:
       - "8000:8000"
     depends_on:
       postgres:
         condition: service_healthy
+      redis:
+        condition: service_started
+
+  worker:
+    build: ./backend
+    command: celery -A app.core.celery_app worker -l info
+    environment:
+      DATABASE_URL: postgresql+psycopg://report:report123@postgres:5432/report_platform
+      JWT_SECRET: change-me-in-production
+      REDIS_URL: redis://redis:6379/0
+      CELERY_EAGER: "false"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_started
 
   frontend:
     build: ./frontend
