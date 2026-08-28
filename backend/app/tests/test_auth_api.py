@@ -42,3 +42,64 @@ def test_me_with_token(client):
 def test_me_with_bad_token(client):
     resp = client.get("/api/auth/me", headers={"Authorization": "Bearer invalid"})
     assert resp.status_code == 401
+
+
+def test_change_password_flow(client):
+    headers = {"Authorization": "Bearer " + client.post(
+        "/api/auth/login", json={"username": "admin", "password": "admin123"}
+    ).json()["access_token"]}
+
+    # 旧密码错误
+    resp = client.post(
+        "/api/auth/change-password",
+        headers=headers,
+        json={"old_password": "wrong-old", "new_password": "newpass123"},
+    )
+    assert resp.status_code == 400
+
+    # 新密码过短（pydantic 校验 422）
+    resp = client.post(
+        "/api/auth/change-password",
+        headers=headers,
+        json={"old_password": "admin123", "new_password": "short"},
+    )
+    assert resp.status_code == 422
+
+    # 与旧密码相同
+    resp = client.post(
+        "/api/auth/change-password",
+        headers=headers,
+        json={"old_password": "admin123", "new_password": "admin123"},
+    )
+    assert resp.status_code == 400
+
+    # 成功修改 → 旧密码失效、新密码可登录
+    resp = client.post(
+        "/api/auth/change-password",
+        headers=headers,
+        json={"old_password": "admin123", "new_password": "newpass123"},
+    )
+    assert resp.status_code == 200
+    assert client.post(
+        "/api/auth/login", json={"username": "admin", "password": "admin123"}
+    ).status_code == 401
+    assert client.post(
+        "/api/auth/login", json={"username": "admin", "password": "newpass123"}
+    ).status_code == 200
+
+    # 审计已记录
+    actions = {a["action"] for a in client.get(
+        "/api/audit?action=password_change",
+        headers={"Authorization": "Bearer " + client.post(
+            "/api/auth/login", json={"username": "admin", "password": "newpass123"}
+        ).json()["access_token"]},
+    ).json()}
+    assert "password_change" in actions
+
+
+def test_change_password_requires_auth(client):
+    resp = client.post(
+        "/api/auth/change-password",
+        json={"old_password": "a", "new_password": "bbbbbbbb"},
+    )
+    assert resp.status_code == 401

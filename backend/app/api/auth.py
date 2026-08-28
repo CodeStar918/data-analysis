@@ -3,10 +3,10 @@ from fastapi import APIRouter, Depends, HTTPException, Request, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from sqlalchemy.orm import Session
 
-from app.core.security import create_access_token, decode_token, verify_password
+from app.core.security import create_access_token, decode_token, hash_password, verify_password
 from app.db.session import get_db
 from app.models.user import User
-from app.schemas.auth import CurrentUser, LoginRequest, LoginResponse
+from app.schemas.auth import ChangePasswordRequest, CurrentUser, LoginRequest, LoginResponse
 from app.services.audit_service import audit
 
 router = APIRouter(prefix="/api/auth", tags=["auth"])
@@ -54,3 +54,25 @@ def require_admin(user: CurrentUser = Depends(get_current_user)) -> CurrentUser:
     if user.role not in ("admin", "dept_admin"):
         raise HTTPException(status.HTTP_403_FORBIDDEN, "需要管理员权限")
     return user
+
+
+@router.post("/change-password")
+def change_password(
+    body: ChangePasswordRequest,
+    request: Request,
+    db: Session = Depends(get_db),
+    user: CurrentUser = Depends(get_current_user),
+):
+    """自助修改密码：校验旧密码，新密码至少 8 位。"""
+    ip = request.client.host if request.client else ""
+    row = db.get(User, user.id)
+    if row is None or not verify_password(body.old_password, row.password_hash):
+        audit(db, user.id, user.username, "password_change", "修改失败：旧密码错误", ip, commit=True)
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, "旧密码错误")
+    if verify_password(body.new_password, row.password_hash):
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, "新密码不能与旧密码相同")
+
+    row.password_hash = hash_password(body.new_password)
+    db.commit()
+    audit(db, user.id, user.username, "password_change", "密码修改成功", ip, commit=True)
+    return {"message": "密码已修改，请重新登录"}
