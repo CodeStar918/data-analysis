@@ -1,0 +1,51 @@
+"""登录与当前用户接口。"""
+from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
+from sqlalchemy.orm import Session
+
+from app.core.security import create_access_token, decode_token, verify_password
+from app.db.session import get_db
+from app.models.user import User
+from app.schemas.auth import CurrentUser, LoginRequest, LoginResponse
+
+router = APIRouter(prefix="/api/auth", tags=["auth"])
+bearer_scheme = HTTPBearer(auto_error=False)
+
+
+@router.post("/login", response_model=LoginResponse)
+def login(body: LoginRequest, db: Session = Depends(get_db)) -> LoginResponse:
+    user = db.query(User).filter(User.username == body.username).first()
+    if user is None or not verify_password(body.password, user.password_hash):
+        raise HTTPException(status.HTTP_401_UNAUTHORIZED, "用户名或密码错误")
+    if not user.is_active:
+        raise HTTPException(status.HTTP_403_FORBIDDEN, "账号已禁用")
+
+    token = create_access_token(user.id, user.username)
+    return LoginResponse(access_token=token, username=user.username, role=user.role)
+
+
+def get_current_user(
+    credentials: HTTPAuthorizationCredentials | None = Depends(bearer_scheme),
+    db: Session = Depends(get_db),
+) -> CurrentUser:
+    if credentials is None:
+        raise HTTPException(status.HTTP_401_UNAUTHORIZED, "未登录")
+    payload = decode_token(credentials.credentials)
+    if payload is None:
+        raise HTTPException(status.HTTP_401_UNAUTHORIZED, "令牌无效或已过期")
+    user = db.get(User, int(payload["sub"]))
+    if user is None or not user.is_active:
+        raise HTTPException(status.HTTP_401_UNAUTHORIZED, "用户不存在或已禁用")
+    return CurrentUser(id=user.id, username=user.username, role=user.role, dept=user.dept)
+
+
+@router.get("/me", response_model=CurrentUser)
+def me(user: CurrentUser = Depends(get_current_user)) -> CurrentUser:
+    return user
+
+
+def require_admin(user: CurrentUser = Depends(get_current_user)) -> CurrentUser:
+    """管理员权限：admin / dept_admin 可用。"""
+    if user.role not in ("admin", "dept_admin"):
+        raise HTTPException(status.HTTP_403_FORBIDDEN, "需要管理员权限")
+    return user
