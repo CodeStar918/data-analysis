@@ -25,6 +25,12 @@ const routes = [
     component: () => import('../views/Metadata.vue'),
     meta: { requiresAuth: true },
   },
+  {
+    path: '/workspace',
+    name: 'Workspace',
+    component: () => import('../views/Workspace.vue'),
+    meta: { requiresAuth: true },
+  },
 ]
 
 const router = createRouter({
