@@ -24,6 +24,11 @@ class Settings(BaseSettings):
     DUCKDB_PATH: str = "./data/report.duckdb"
     MAX_UPLOAD_MB: int = 20
 
+    # 阶段 4：Ollama 本地模型
+    OLLAMA_BASE_URL: str = "http://localhost:11434"
+    OLLAMA_MODEL: str = "qwen2.5:7b"
+    OLLAMA_TIMEOUT_SECONDS: int = 120
+
 
 @lru_cache
 def get_settings() -> Settings:

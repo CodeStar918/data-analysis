@@ -3,13 +3,14 @@
     <el-header class="header">
       <span class="brand">报表生成平台</span>
       <div class="right">
+        <el-button type="primary" @click="$router.push('/workspace')">进入工作台</el-button>
         <el-button text @click="$router.push('/datasources')">数据源管理</el-button>
         <span class="user">{{ user.username }}</span>
         <el-button link type="danger" @click="handleLogout">退出登录</el-button>
       </div>
     </el-header>
     <el-main>
-      <el-empty description="工作台建设中（阶段 4：自然语言解析）" />
+      <el-empty description="用一句话，从数据生成报表（阶段 5 开放任务执行与结果导出）" />
     </el-main>
   </el-container>
 </template>
