@@ -67,12 +67,12 @@ def build_select_sql(meta: TableMeta, parse: ParseResult) -> str:
 
     # add_column：原字段 + 新字段
     if parse.new_columns:
-        new_parts = ",\n    " + ",\n    ".join(
-            f"({_nc['expression']}) AS {_quote_ident(_nc['name'])}" for _nc in parse.new_columns
+        new_parts = ", " + ", ".join(
+            f'({_nc["expression"]}) AS {_quote_ident(_nc["name"])}' for _nc in parse.new_columns
         )
     else:
         new_parts = ""
-    return f"SELECT *\nFROM {table}{new_parts}"
+    return f"SELECT *{new_parts}\nFROM {table}"
 
 
 def _build_condition(f: dict, col_names: set) -> str:

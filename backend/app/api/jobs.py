@@ -33,13 +33,12 @@ def create_job(
         raise HTTPException(403, "只能执行自己的解析记录")
     if not history.valid or not history.confirmed:
         raise HTTPException(400, "解析结果未确认或未通过校验")
-    if json.loads(history.parse_json).get("intent") != "aggregate":
-        raise HTTPException(400, "明细结果生成将在阶段 6 开放")
 
+    intent = json.loads(history.parse_json).get("intent", "aggregate")
     job = Job(
         parse_id=history.id,
         user_id=user.id,
-        job_type="aggregate",
+        job_type=intent,
         status="pending",
     )
     db.add(job)

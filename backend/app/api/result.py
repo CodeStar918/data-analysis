@@ -33,10 +33,12 @@ def list_results(
     return [
         {
             "id": r.id,
+            "job_id": r.job_id,
             "table_name": r.table_name,
             "result_type": r.result_type,
             "business_name": r.business_name,
             "row_count": r.row_count,
+            "applied_to_source": r.applied_to_source,
             "created_at": r.created_at,
         }
         for r in q.all()
