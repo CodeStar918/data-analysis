@@ -1,10 +1,9 @@
 """数据库连接与会话管理。"""
 from collections.abc import Generator
 
+from app.core.config import get_settings
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session, sessionmaker
-
-from app.core.config import get_settings
 
 _engine = None
 _SessionLocal = None

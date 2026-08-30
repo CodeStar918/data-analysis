@@ -1,10 +1,9 @@
 """异步任务与结果表模型（阶段 5）。"""
 from datetime import UTC, datetime
 
+from app.models.user import Base
 from sqlalchemy import Boolean, DateTime, ForeignKey, Integer, String, Text
 from sqlalchemy.orm import Mapped, mapped_column
-
-from app.models.user import Base
 
 
 def _now() -> datetime:

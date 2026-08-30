@@ -1,5 +1,4 @@
 """集成测试：NL 解析接口（mock Ollama）、SQL 预览、确认流程。"""
-import pytest
 
 from app.services import ollama_service
 from app.services.ollama_service import OllamaError

@@ -7,7 +7,6 @@ import threading
 
 import duckdb
 import pandas as pd
-
 from app.core.config import get_settings
 
 _lock = threading.Lock()

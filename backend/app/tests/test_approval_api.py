@@ -1,9 +1,8 @@
 """集成测试：明细任务写回审批流程（阶段 6）。"""
 import pytest
-from sqlalchemy import create_engine, text
-
 from app.models.user import User
 from app.services import db_service, ollama_service
+from sqlalchemy import create_engine, text
 
 ADD_COL_OK = {
     "intent": "add_column",

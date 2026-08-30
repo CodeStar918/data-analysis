@@ -105,11 +105,11 @@
 </template>
 
 <script setup>
-import { computed, onMounted, ref } from 'vue'
-import { useRouter } from 'vue-router'
-import { ElMessage } from 'element-plus'
+import {computed, onMounted, ref} from 'vue'
+import {useRouter} from 'vue-router'
+import {ElMessage} from 'element-plus'
 import request from '../api/request'
-import { useUserStore } from '../stores/user'
+import {useUserStore} from '../stores/user'
 
 const router = useRouter()
 const user = useUserStore()

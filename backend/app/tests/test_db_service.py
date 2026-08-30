@@ -1,8 +1,7 @@
 """业务库只读服务单元测试。"""
 import pytest
-from sqlalchemy import create_engine, text
-
 from app.services import db_service
+from sqlalchemy import create_engine, text
 
 
 @pytest.fixture()

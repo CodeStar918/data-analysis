@@ -1,13 +1,12 @@
 """登录与当前用户接口。"""
-from fastapi import APIRouter, Depends, HTTPException, Request, status
-from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
-from sqlalchemy.orm import Session
-
 from app.core.security import create_access_token, decode_token, hash_password, verify_password
 from app.db.session import get_db
 from app.models.user import User
 from app.schemas.auth import ChangePasswordRequest, CurrentUser, LoginRequest, LoginResponse
 from app.services.audit_service import audit
+from fastapi import APIRouter, Depends, HTTPException, Request, status
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
+from sqlalchemy.orm import Session
 
 router = APIRouter(prefix="/api/auth", tags=["auth"])
 bearer_scheme = HTTPBearer(auto_error=False)

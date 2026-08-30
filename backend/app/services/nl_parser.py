@@ -7,7 +7,7 @@ LLM 只负责输出结构化 JSON；本模块负责：
 import re
 from typing import Any
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict
 
 # 白名单
 ALLOWED_AGGS = {"SUM", "COUNT", "AVG", "MAX", "MIN"}

@@ -5,7 +5,6 @@ import os
 from datetime import datetime, timedelta, timezone
 
 import jwt
-
 from app.core.config import get_settings
 
 _ITERATIONS = 120_000

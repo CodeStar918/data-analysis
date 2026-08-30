@@ -1,9 +1,8 @@
 """集成测试：数据库数据源接入、元数据维护、权限控制。"""
 import pytest
-from sqlalchemy import create_engine, text
-
 from app.models.user import User
 from app.services import db_service
+from sqlalchemy import create_engine, text
 
 
 @pytest.fixture()

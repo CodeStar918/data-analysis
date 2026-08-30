@@ -1,13 +1,12 @@
 """数据源与表预览接口。"""
-from fastapi import APIRouter, Depends, HTTPException, Query
-from sqlalchemy.orm import Session
-
 from app.api.auth import get_current_user
 from app.core.crypto import decrypt
 from app.db.session import get_db
 from app.models.datasource import Datasource, MetaColumn, MetaTable
 from app.schemas.auth import CurrentUser
 from app.services import db_service, duckdb_service
+from fastapi import APIRouter, Depends, HTTPException, Query
+from sqlalchemy.orm import Session
 
 router = APIRouter(prefix="/api", tags=["datasource"])
 

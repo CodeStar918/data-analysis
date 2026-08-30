@@ -1,7 +1,4 @@
 """元数据管理与数据库数据源接入接口（管理员）。"""
-from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy.orm import Session
-
 from app.api.auth import require_admin
 from app.db.session import get_db
 from app.models.datasource import Datasource, MetaColumn, MetaTable
@@ -10,6 +7,8 @@ from app.schemas.metadata import DbDatasourceCreate, MetaColumnUpdate, MetaTable
 from app.services import db_service
 from app.services.audit_service import audit
 from app.services.metadata_service import register_db_tables
+from fastapi import APIRouter, Depends, HTTPException
+from sqlalchemy.orm import Session
 
 router = APIRouter(prefix="/api", tags=["metadata"])
 

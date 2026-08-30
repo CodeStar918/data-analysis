@@ -1,14 +1,17 @@
 """FastAPI 入口。"""
-from contextlib import asynccontextmanager
+import sys
+from pathlib import Path
 
-from fastapi import FastAPI
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+
+from contextlib import asynccontextmanager
 
 from app.api.approval import router as approval_router
 from app.api.audit import router as audit_router
 from app.api.auth import router as auth_router
 from app.api.datasource import router as datasource_router
-from app.api.metadata import router as metadata_router
 from app.api.jobs import router as jobs_router
+from app.api.metadata import router as metadata_router
 from app.api.nl_parse import router as nl_parse_router
 from app.api.result import router as result_router
 from app.api.upload import router as upload_router
@@ -16,6 +19,7 @@ from app.core.config import get_settings
 from app.core.logging import setup_logging
 from app.db.session import get_engine
 from app.models.base_seed import init_db
+from fastapi import FastAPI
 
 logger = setup_logging()
 

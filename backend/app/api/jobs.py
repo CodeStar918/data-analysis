@@ -1,10 +1,6 @@
 """任务接口：提交统计任务、查询状态。"""
 import json
 
-from fastapi import APIRouter, Depends, HTTPException
-from pydantic import BaseModel, Field
-from sqlalchemy.orm import Session
-
 from app.api.auth import get_current_user
 from app.db.session import get_db
 from app.models.job import Job
@@ -12,6 +8,9 @@ from app.models.parse_history import ParseHistory
 from app.schemas.auth import CurrentUser
 from app.services import job_service
 from app.services.audit_service import audit
+from fastapi import APIRouter, Depends, HTTPException
+from pydantic import BaseModel, Field
+from sqlalchemy.orm import Session
 
 router = APIRouter(prefix="/api/jobs", tags=["job"])
 

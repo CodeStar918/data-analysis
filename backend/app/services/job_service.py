@@ -2,8 +2,6 @@
 import json
 from datetime import UTC, datetime
 
-from sqlalchemy.orm import Session
-
 from app.core.crypto import decrypt
 from app.core.logging import setup_logging
 from app.db.session import get_engine
@@ -13,6 +11,7 @@ from app.models.parse_history import ParseHistory
 from app.services import db_service, duckdb_service
 from app.services.nl_parser import ParseResult, TableMeta, validate
 from app.services.sql_builder import build_select_sql
+from sqlalchemy.orm import Session
 
 logger = setup_logging()
 

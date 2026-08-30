@@ -1,7 +1,4 @@
 """文件上传接口：Excel → 解析 → DuckDB 导入 → 元数据登记。"""
-from fastapi import APIRouter, Depends, File, HTTPException, UploadFile
-from sqlalchemy.orm import Session
-
 from app.api.auth import get_current_user
 from app.core.config import get_settings
 from app.db.session import get_db
@@ -11,6 +8,8 @@ from app.services import duckdb_service
 from app.services.audit_service import audit
 from app.services.excel_service import parse_excel
 from app.services.metadata_service import register_excel_datasource
+from fastapi import APIRouter, Depends, File, HTTPException, UploadFile
+from sqlalchemy.orm import Session
 
 router = APIRouter(prefix="/api/upload", tags=["upload"])
 

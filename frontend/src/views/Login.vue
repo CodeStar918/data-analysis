@@ -29,11 +29,11 @@
 </template>
 
 <script setup>
-import { reactive, ref } from 'vue'
-import { useRouter } from 'vue-router'
-import { ElMessage } from 'element-plus'
-import { User, Lock } from '@element-plus/icons-vue'
-import { useUserStore } from '../stores/user'
+import {reactive, ref} from 'vue'
+import {useRouter} from 'vue-router'
+import {ElMessage} from 'element-plus'
+import {Lock, User} from '@element-plus/icons-vue'
+import {useUserStore} from '../stores/user'
 
 const router = useRouter()
 const userStore = useUserStore()

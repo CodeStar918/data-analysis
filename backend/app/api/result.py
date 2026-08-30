@@ -1,11 +1,6 @@
 """结果接口：列表、预览、导出 Excel/CSV。"""
-import csv
 import io
 from urllib.parse import quote
-
-from fastapi import APIRouter, Depends, HTTPException, Query
-from fastapi.responses import StreamingResponse
-from sqlalchemy.orm import Session
 
 from app.api.auth import get_current_user
 from app.db.session import get_db
@@ -13,6 +8,9 @@ from app.models.job import ResultTable
 from app.schemas.auth import CurrentUser
 from app.services import duckdb_service
 from app.services.audit_service import audit
+from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi.responses import StreamingResponse
+from sqlalchemy.orm import Session
 
 router = APIRouter(prefix="/api/results", tags=["result"])
 

@@ -1,11 +1,10 @@
 """数据库初始化与种子数据。"""
 import logging
 
-from sqlalchemy import Engine
-from sqlalchemy.orm import Session
-
 from app.core.security import hash_password
 from app.models.user import Base, User
+from sqlalchemy import Engine
+from sqlalchemy.orm import Session
 
 logger = logging.getLogger("app")
 

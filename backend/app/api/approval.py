@@ -2,11 +2,6 @@
 import json
 from datetime import UTC, datetime
 
-from fastapi import APIRouter, Depends, HTTPException
-from pydantic import BaseModel, Field
-from sqlalchemy import func
-from sqlalchemy.orm import Session
-
 from app.api.auth import get_current_user, require_admin
 from app.db.session import get_db
 from app.models.approval import Approval
@@ -16,6 +11,10 @@ from app.models.parse_history import ParseHistory
 from app.schemas.auth import CurrentUser
 from app.services.approval_service import apply_writeback
 from app.services.audit_service import audit
+from fastapi import APIRouter, Depends, HTTPException
+from pydantic import BaseModel, Field
+from sqlalchemy import func
+from sqlalchemy.orm import Session
 
 router = APIRouter(prefix="/api/approvals", tags=["approval"])
 

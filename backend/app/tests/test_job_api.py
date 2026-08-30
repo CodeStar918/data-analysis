@@ -2,8 +2,6 @@
 import io
 
 import pandas as pd
-import pytest
-
 from app.services import ollama_service
 from app.tests.excel_helpers import SAMPLE_TIME, build_xlsx
 

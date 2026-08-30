@@ -1,10 +1,9 @@
 """NL 解析历史模型。"""
 from datetime import UTC, datetime
 
-from sqlalchemy import Boolean, DateTime, ForeignKey, Integer, String, Text
-from sqlalchemy.orm import Mapped, mapped_column
-
 from app.models.user import Base
+from sqlalchemy import Boolean, DateTime, ForeignKey, Integer, Text
+from sqlalchemy.orm import Mapped, mapped_column
 
 
 class ParseHistory(Base):

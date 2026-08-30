@@ -1,13 +1,10 @@
 """阶段 7 安全加固测试：连接信息加密、审计日志完整性、越权访问。"""
-import io
-
-import pytest
-from sqlalchemy import create_engine, text
-from sqlalchemy.orm import sessionmaker
 
 from app.core.crypto import decrypt, encrypt
 from app.services import ollama_service
 from app.tests.excel_helpers import SAMPLE_TIME, build_xlsx
+from sqlalchemy import create_engine, text
+from sqlalchemy.orm import sessionmaker
 
 AGG_OK = {
     "intent": "aggregate",

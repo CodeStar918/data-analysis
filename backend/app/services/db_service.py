@@ -7,7 +7,6 @@
 import re
 
 import sqlalchemy as sa
-
 from app.core.logging import setup_logging
 
 logger = setup_logging()

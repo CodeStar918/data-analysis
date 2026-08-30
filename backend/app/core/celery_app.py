@@ -4,9 +4,8 @@
 生产部署设 CELERY_EAGER=false，启动 worker：
   celery -A app.core.celery_app worker -l info
 """
-from celery import Celery
-
 from app.core.config import get_settings
+from celery import Celery
 
 _settings = get_settings()
 

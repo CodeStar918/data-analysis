@@ -1,8 +1,7 @@
 """审计服务：关键动作统一落审计日志。"""
-from sqlalchemy.orm import Session
-
 from app.core.logging import setup_logging
 from app.models.audit import AuditLog
+from sqlalchemy.orm import Session
 
 logger = setup_logging()
 

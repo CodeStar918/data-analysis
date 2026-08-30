@@ -1,9 +1,6 @@
 """自然语言解析接口：解析 → 校验 → SQL 预览 → 用户确认。"""
 import json
 
-from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy.orm import Session
-
 from app.api.auth import get_current_user
 from app.db.session import get_db
 from app.models.datasource import MetaColumn, MetaTable
@@ -15,6 +12,8 @@ from app.services.audit_service import audit
 from app.services.nl_parser import TableMeta, build_prompt, validate
 from app.services.ollama_service import OllamaError
 from app.services.sql_builder import build_select_sql
+from fastapi import APIRouter, Depends, HTTPException
+from sqlalchemy.orm import Session
 
 router = APIRouter(prefix="/api/nl", tags=["nl"])
 

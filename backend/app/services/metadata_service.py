@@ -1,9 +1,8 @@
 """元数据登记：数据源 → 表 → 字段。"""
-from sqlalchemy.orm import Session
-
 from app.core.crypto import encrypt
 from app.models.datasource import Datasource, MetaColumn, MetaTable
 from app.services.excel_service import ParsedSheet
+from sqlalchemy.orm import Session
 
 
 def register_excel_datasource(

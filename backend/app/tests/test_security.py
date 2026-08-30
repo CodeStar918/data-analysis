@@ -2,7 +2,6 @@
 import time
 
 import jwt as pyjwt
-
 from app.core.config import get_settings
 from app.core.security import create_access_token, decode_token, hash_password, verify_password
 

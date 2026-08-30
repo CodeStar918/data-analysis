@@ -1,10 +1,9 @@
 """数据源与元数据模型（阶段 2：Excel 数据源登记；阶段 3 扩展管理功能）。"""
 from datetime import UTC, datetime
 
+from app.models.user import Base
 from sqlalchemy import DateTime, ForeignKey, Integer, String, Text
 from sqlalchemy.orm import Mapped, mapped_column
-
-from app.models.user import Base
 
 
 def _now() -> datetime:
